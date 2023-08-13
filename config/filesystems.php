@@ -56,6 +56,12 @@ return [
             'throw' => false,
         ],
 
+        'onedrive' => [
+            'driver' => 'onedrive',
+            'root' => env('ONEDRIVE_ROOT'),
+            'access_token' => env('ONEDRIVE_ACCESS_TOKEN'), //optional if demanded
+            'directory_type' => env('ONEDRIVE_DIR_TYPE')
+        ],
     ],
 
     /*
