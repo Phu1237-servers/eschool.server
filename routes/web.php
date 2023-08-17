@@ -16,3 +16,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/one', [App\Http\Controllers\OneDriveController::class, 'index']);
+Route::get('/access_token_response', [App\Http\Controllers\OneDriveController::class, 'access_token_response'])->name('redirect_uri');
