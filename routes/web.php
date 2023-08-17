@@ -18,7 +18,8 @@ Route::get('/', function () {
 });
 
 Route::group(['middleware' => 'onedrive'], function () {
-	Route::get('/one', [App\Http\Controllers\OneDriveController::class, 'index']);
-	Route::get('logout', [App\Http\Controllers\OneDriveController::class, 'logout']);
+	Route::get('/one', [App\Http\Controllers\OneDriveController::class, 'index'])->name('one');
+	Route::get('flush', [App\Http\Controllers\OneDriveController::class, 'flush']);
+	Route::get('revoke', [App\Http\Controllers\OneDriveController::class, 'revoke']);
 });
 Route::get('/access_token_response', [App\Http\Controllers\OneDriveController::class, 'access_token_response'])->name('redirect_uri');

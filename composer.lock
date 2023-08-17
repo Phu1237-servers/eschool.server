@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bf4fa50dd7af9f8206bcd1ff9554c4f4",
+    "content-hash": "3b9bea76cb6b1c7fd81022c6c4374741",
     "packages": [
         {
             "name": "brick/math",
@@ -973,60 +973,6 @@
                 }
             ],
             "time": "2021-10-07T12:57:01+00:00"
-        },
-        {
-            "name": "justus/flysystem-onedrive",
-            "version": "v2.0.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/doerffler/flysystem-onedrive.git",
-                "reference": "41a9ed02f6484a9169841377094b4aeedfb06796"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/doerffler/flysystem-onedrive/zipball/41a9ed02f6484a9169841377094b4aeedfb06796",
-                "reference": "41a9ed02f6484a9169841377094b4aeedfb06796",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/support": "^9.0|^10.0",
-                "league/flysystem": "^3.2",
-                "microsoft/microsoft-graph": "^1.74",
-                "php": "^8.0.2"
-            },
-            "require-dev": {
-                "laravel/framework": "^9.19",
-                "orchestra/testbench": "^v7.1.0",
-                "phpunit/phpunit": "^9.0.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Justus\\FlysystemOneDrive\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Justus Donner",
-                    "email": "jdonner@doerffler.com"
-                }
-            ],
-            "description": "A flysystem driver for OneDrive that uses the Microsoft Graph API",
-            "keywords": [
-                "Flysystem",
-                "OneDrive",
-                "api",
-                "flysystem-onedrive"
-            ],
-            "support": {
-                "issues": "https://github.com/doerffler/flysystem-onedrive/issues",
-                "source": "https://github.com/doerffler/flysystem-onedrive/tree/v2.0.3"
-            },
-            "time": "2023-04-26T18:24:07+00:00"
         },
         {
             "name": "laravel/framework",

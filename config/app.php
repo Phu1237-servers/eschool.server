@@ -168,7 +168,6 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        Justus\FlysystemOneDrive\Providers\OneDriveAdapterServiceProvider::class,
     ])->toArray(),
 
     /*
