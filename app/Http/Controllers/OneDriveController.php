@@ -15,12 +15,8 @@ class OneDriveController extends Controller
     private $graph;
     public function __construct()
     {
-        if (Cache::has('onedrive_access_token')) {
-            $this->graph = new Graph();
-            $this->graph->setAccessToken(Cache::get('onedrive_access_token'));
-        } else {
-            return redirect()->to('https://login.live.com/oauth20_authorize.srf?client_id='.env('ONEDRIVE_CLIENT_ID').'&scope='.env('ONEDRIVE_SCOPE').'&response_type=code&redirect_uri=https://your-video-api.test/access_token_response')->send();
-        }
+        $this->graph = new Graph();
+        $this->graph->setAccessToken(Cache::get('onedrive_access_token'));
     }
 
     public function access_token_response(Request $request)
@@ -37,15 +33,16 @@ class OneDriveController extends Controller
             'client_id' => env('ONEDRIVE_CLIENT_ID'),
             'client_secret' => env('ONEDRIVE_CLIENT_SECRET'),
             'code' => $code,
-            'redirect_uri' => 'https://your-video-api.test/access_token_response',
+            'redirect_uri' => env('ONEDRIVE_REDIRECT_URI'),
         ];
         $grant_type = 'authorization_code';
-        if (!Cache::has('onedrive_access_token')) {
+        if (!Cache::has('onedrive_access_token') && Cache::has('onedrive_refresh_token')) {
             $grant_type = 'refresh_token';
             $body['refresh_token'] = Cache::get('onedrive_refresh_token');
         }
         $body['grant_type'] = $grant_type;
-        $http = Http::post('https://login.live.com/oauth20_token.srf', $body);
+        $http = Http::asForm()
+            ->post('https://login.live.com/oauth20_token.srf', $body);
 
         Cache::rememberForever('onedrive_refresh_token', function () use ($http) {
             return $http['refresh_token'];
@@ -54,45 +51,59 @@ class OneDriveController extends Controller
             return $http['access_token'];
         });
 
-        return $http['token'];
-    }
-
-    private function auth()
-    {
-        $result = $this->graph->createRequest('GET', 'https://login.microsoftonline.com/consumers/oauth2/v2.0/token')
-            ->attachBody([
-                'grant_type' => 'client_credentials',
-                'client_id' => 'eba0e7fd-a49a-4954-a40d-01e0dae08279',
-                'client_secret'=> 'lXU8Q~fWeOHKQPaqnd6Hkr6fJjYctTWMfha4zc.o',
-                'username' => 'phuvip867',
-                'password' => '5SiUQWrf2h',
-                'scope' => 'eba0e7fd-a49a-4954-a40d-01e0dae08279/.default offline_access',
-            ])
-            ->setReturnType(User::class)
-            ->execute();
-
-        var_dump($result); exit;
-
-        return $result;
+        return $http['access_token'];
     }
 
     public function index()
     {
-        $directory_path = '/Data/HocTap/Vue School';
+        $directory_path = 'drive/root:/Data/HocTap/Vue School';
         $directories = $this->getDirectoryContent($directory_path);
-        foreach ($directories as $item) {
-            $item = $item->getProperties();
-            $item_path = $directory_path.'/'.$item['name'];
-            // echo $item->name. '<br>';
+        $result = [];
+        for ($i = 0; $i < count($directories); $i++) {
+            $result[$i] = $this->directoryToArray($directories[$i]);
         }
 
-        return $directories;
+        return $result;
     }
 
-    private function getDirectoryContent($path): Directory
+    private function directoryToArray($directory, $recusion = false)
     {
-        return $this->graph->createRequest('GET', 'https://graph.microsoft.com/v1.0/me/drive/root:'.$path.':/children?$select=id,name,webUrl')
-            ->setReturnType(Directory::class)
-            ->execute();
+        $item = $directory->getProperties();
+        $array = [];
+        $continue = [
+            'id', 'name', 'webUrl', 'parentReference', 'folder',
+        ];
+        foreach($item as $key => $value) {
+            if (!in_array($key, $continue)) {
+                continue;
+            }
+            $array[$key] = $value;
+        }
+        if ($recusion && isset($array['folder'])) {
+            $path = urldecode($array['parentReference']['path']).'/'.$array['name'];
+            $directories = $this->getDirectoryContent($path);
+            $children = [];
+            for ($i = 0; $i < count($directories); $i++) {
+                $children[$i] = $this->directoryToArray($directories[$i]);
+            }
+            $array['children'] = $children;
+        }
+        return $array;
+    }
+
+    private function getDirectoryContent($path): Directory|Array
+    {
+        if ($this->graph) {
+            return $this->graph->createRequest('GET', 'https://graph.microsoft.com/v1.0/me/'.$path.':/children')
+                ->setReturnType(Directory::class)
+                ->execute();
+        }
+        return [];
+    }
+    
+    public function logout()
+    {
+        Cache::forget('onedrive_refresh_token');
+        Cache::forget('onedrive_access_token');
     }
 }
