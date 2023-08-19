@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use Cache;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Microsoft\Graph\Graph;
-// use Microsoft\Graph\Http\GraphResponse;
+use Microsoft\Graph\Model\Thumbnail;
 use Microsoft\Graph\Model\Directory;
 use Microsoft\Graph\Model\Video;
 use Illuminate\Support\Facades\Http;
+use Log;
 
 class OneDriveController extends Controller
 {
@@ -44,7 +44,7 @@ class OneDriveController extends Controller
         $body['grant_type'] = $grant_type;
         $http = Http::asForm()
             ->post('https://login.live.com/oauth20_token.srf', $body);
-
+        Log::info($http->body());
         Cache::rememberForever('onedrive_refresh_token', function () use ($http) {
             return $http['refresh_token'];
         });
@@ -64,7 +64,44 @@ class OneDriveController extends Controller
         }
 
         $result = Cache::get('onedrive_directories');
-        $this->flush();
+        // $this->flush();
+
+        return $result->map(function ($item) {
+            if (isset($item['children'])) {
+                $item['children'] = $this->mergeVideoSub($item['children']);
+            }
+
+            return $item;
+        });
+    }
+
+    private function mergeVideoSub($data)
+    {
+        $data = $data->groupBy('file.basename');
+        $result = $data->map(function ($item, $key) {
+            $video = $item->firstWhere('file.extension', 'mp4');
+            $subtitle = $item->firstWhere('file.extension', 'vtt');
+            if (!$video) {
+                return [
+                    'type' => 'other',
+                    'data' => $item
+                ];
+            }
+
+            $result = [
+                'type' => 'video',
+                'data' => [
+                    'title' => $key,
+                    'videoUrl' => $video['url'],
+                    'videoThumbnail' => $video['thumbnail'],
+                ]
+            ];
+            if ($subtitle) {
+                $result['data']['subtitleUrl'] = $subtitle['url'];
+            }
+
+            return $result;
+        })->values();
 
         return $result;
     }
@@ -72,65 +109,71 @@ class OneDriveController extends Controller
     private function getDirectory($path, $recusion = false)
     {
         $directories = $this->getDirectoryByPath($path);
-        $result = [];
+        $result = collect();
         for ($i = 0; $i < count($directories); $i++) {
-            $result[$i] = $this->directoryToArray($directories[$i], $recusion);
+            $result->push($this->directoryToCollection($directories[$i], $recusion));
         }
 
         return $result;
     }
 
-    private function directoryToArray($directory, $recusion = false)
+    private function directoryToCollection($directory, $recusion = false)
     {
-        $array = [];
-        foreach ($directory->getProperties() as $key => $value) {
-            $array[$key] = $value;
+        $collection = collect($directory->getProperties());
+        if ($recusion && isset($collection['folder'])) {
+            $path = urldecode($collection['parentReference']['path']).'/'.$collection['name'];
+            $collection->put('children', $this->getDirectory($path, $recusion));
         }
-        if ($recusion && isset($array['folder'])) {
-            $path = urldecode($array['parentReference']['path']).'/'.$array['name'];
-            $array['children'] = $this->getDirectory($path, $recusion);
-        }
-        if (isset($array['file'])) {
-            if ($array['file']['mimeType'] == 'video/mp4') {
-                $array = $this->getVideoById($array['id'])->getProperties();
+        if (isset($collection['file'])) {
+            // Video properties
+            if ($collection['file']['mimeType'] == 'video/mp4') {
+                $collection = collect($this->getVideoById($collection['id'])->getProperties());
+            }
+            // File name without extension
+            $collection->put('file', [
+                'basename' => pathinfo($collection['name'], PATHINFO_FILENAME),
+                'extension' => pathinfo($collection['name'], PATHINFO_EXTENSION),
+            ]);
+            // Public download url
+            if (isset($collection['@microsoft.graph.downloadUrl'])) {
+                $collection->put('url', $collection['@microsoft.graph.downloadUrl']);
             }
         }
-        if (isset($array['@microsoft.graph.downloadUrl'])) {
-            $array['url'] = $array['@microsoft.graph.downloadUrl'];
-        }
+        // File thumbnail
+        $collection->put('thumbnail', collect($this->getThumbnailById($collection['id'])));
 
-        return $this->model_to_array($array);
+        return $this->model_to_array($collection);
     }
 
     private function model_to_array($model)
     {
         $allowed = [
-            'id', 'name', 'webUrl', 'children', 'url', 'video', 'file'
+            'id', 'name', 'webUrl', 'file',
+            'baseName', 'children', 'url', 'video', 'thumbnail', // Custom properties
         ];
 
-        return Arr::only($model, $allowed);
+        return $model->only($allowed);
     }
 
     private function getDirectoryByPath($path): Directory | array
     {
-        if ($this->graph) {
-            return $this->graph->createRequest('GET', 'https://graph.microsoft.com/v1.0/me/'.$path.':/children')
-                ->setReturnType(Directory::class)
-                ->execute();
-        }
-
-        return [];
+        return $this->graph->createRequest('GET', 'https://graph.microsoft.com/v1.0/me/'.$path.':/children')
+            ->setReturnType(Directory::class)
+            ->execute();
     }
 
     private function getVideoById($id)
     {
-        if ($this->graph) {
-            return $this->graph->createRequest('GET', 'https://graph.microsoft.com/v1.0/me/drive/items/'.$id)
-                ->setReturnType(Video::class)
-                ->execute();
-        }
+        return $this->graph->createRequest('GET', 'https://graph.microsoft.com/v1.0/me/drive/items/'.$id)
+            ->setReturnType(Video::class)
+            ->execute();
+    }
 
-        return [];
+    private function getThumbnailById($id)
+    {
+        return $this->graph->createRequest('GET', 'https://graph.microsoft.com/v1.0/me/drive/items/'.$id.'/thumbnails')
+            ->setReturnType(Thumbnail::class)
+            ->execute();
     }
 
     public function flush()
