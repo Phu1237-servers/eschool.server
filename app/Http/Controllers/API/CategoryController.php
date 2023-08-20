@@ -4,16 +4,23 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Repositories\CategoryRepository;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
+    private $categoryRepository;
+    public function __construct(CategoryRepository $categoryRepository)
+    {
+        $this->categoryRepository = $categoryRepository;
+        $this->middleware(['auth:sanctum', 'verified', 'admin'])->except(['index', 'show']);
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        return $this->categoryRepository->all();
     }
 
     /**
@@ -21,7 +28,9 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $attributes = $request->only(['name', 'cloud_id', 'cloud_path']);
+
+        return $this->categoryRepository->store($attributes);
     }
 
     /**
@@ -29,7 +38,7 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
-        //
+        return $category;
     }
 
     /**
@@ -37,7 +46,9 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
-        //
+        $attributes = $request->only(['name', 'cloud_id', 'cloud_path']);
+
+        return $this->categoryRepository->update($category, $attributes);
     }
 
     /**
@@ -45,6 +56,6 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        //
+        return $this->categoryRepository->destroy($category);
     }
 }
