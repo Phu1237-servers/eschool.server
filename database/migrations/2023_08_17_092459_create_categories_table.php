@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->text('name');
-            $table->text('cloud_id')->unique()->nullable();
-            $table->text('cloud_path')->unique()->nullable();
+            $table->string('cloud_id')->unique()->nullable();
+            $table->text('cloud_path')->nullable();
             $table->timestamps();
         });
     }

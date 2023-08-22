@@ -19,8 +19,8 @@ return new class extends Migration
             $table->string('duration');
             $table->text('download_url');
             $table->text('subtitle_url');
-            $table->text('cloud_id')->unique()->nullable();
-            $table->text('cloud_path')->unique()->nullable();
+            $table->string('cloud_id')->unique()->nullable();
+            $table->text('cloud_path')->nullable();
             $table->foreignIdFor(Course::class)->constrained();
             $table->timestamps();
         });
