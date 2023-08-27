@@ -50,6 +50,7 @@ class InstallController extends Controller
         } else {
             $result = Cache::get(OneDriveType::CACHE_DIRECTORIES);
         }
+        // dd($result);
         $result->each(function ($category) {
             $new_category = Category::updateOrcreate([
                 'cloud_id' => $category['id'],
@@ -77,7 +78,7 @@ class InstallController extends Controller
                             'cloud_path' => $video_data['path'],
                         ], [
                             'name' => $video_data['name'],
-                            'thumbnail' => '',
+                            'thumbnail' => $video_data['videoThumbnail']->first()->getProperties()['large']['url'],
                             'duration' => $video_data['duration'],
                             'download_url' => $video_data['videoUrl'],
                             'subtitle_url' => $video_data['subtitleUrl'],
