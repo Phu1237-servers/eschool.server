@@ -17,7 +17,7 @@ class InstallController extends Controller
     private $installRepository;
     private $oneDriveRepository;
     private $log;
-    public function __construct(InstallRepository $installRepository,OneDriveInterface $oneDriveRepository)
+    public function __construct(InstallRepository $installRepository, OneDriveInterface $oneDriveRepository)
     {
         $this->installRepository = $installRepository;
         $this->oneDriveRepository = $oneDriveRepository;
@@ -50,7 +50,6 @@ class InstallController extends Controller
         } else {
             $result = Cache::get(OneDriveType::CACHE_DIRECTORIES);
         }
-        // dd($result);
         $result->each(function ($category) {
             $new_category = Category::updateOrcreate([
                 'cloud_id' => $category['id'],

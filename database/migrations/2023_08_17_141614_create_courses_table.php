@@ -17,6 +17,7 @@ return new class extends Migration
             $table->text('name');
             $table->text('description');
             $table->text('thumbnail');
+            $table->unsignedInteger('views')->default(0);
             $table->string('cloud_id')->unique()->nullable();
             $table->text('cloud_path')->nullable();
             $table->foreignIdFor(Category::class)->constrained();

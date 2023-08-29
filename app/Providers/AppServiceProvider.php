@@ -6,6 +6,8 @@ use App\Repositories\CategoryInterface;
 use App\Repositories\CategoryRepository;
 use App\Repositories\Cloud\OneDriveInterface;
 use App\Repositories\Cloud\OneDriveRepository;
+use App\Repositories\InstallInterface;
+use App\Repositories\InstallRepository;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -15,6 +17,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        // General
+        $this->app->bind(InstallInterface::class, InstallRepository::class);
         // Models
         $this->app->bind(CategoryInterface::class, CategoryRepository::class);
         // OneDrive

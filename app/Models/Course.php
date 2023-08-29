@@ -9,7 +9,7 @@ class Course extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'name', 'description', 'thumbnail', 'cloud_id', 'cloud_path', 'category_id'
+        'name', 'description', 'thumbnail', 'views', 'cloud_id', 'cloud_path', 'category_id'
     ];
     protected $appends = [
         'current_progress'
@@ -42,5 +42,10 @@ class Course extends Model
         }
 
         return 0;
+    }
+
+    public function getRelatedCoursesAttribute()
+    {
+        return $this->where('category_id', $this->category_id)->where('id', '!=', $this->id)->get();
     }
 }

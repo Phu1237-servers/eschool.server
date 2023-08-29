@@ -13,7 +13,6 @@ class CategoryController extends Controller
     public function __construct(CategoryRepository $categoryRepository)
     {
         $this->categoryRepository = $categoryRepository;
-        $this->middleware(['auth:sanctum', 'verified', 'admin'])->except(['index', 'show']);
     }
     /**
      * Display a listing of the resource.

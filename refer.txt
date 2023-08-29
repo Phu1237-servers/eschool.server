@@ -1,0 +1,9 @@
+Login:
+- https://learn.microsoft.com/en-us/onedrive/developer/rest-api/getting-started/graph-oauth?view=odsp-graph-online
+- https://learn.microsoft.com/en-us/onedrive/developer/rest-api/getting-started/msa-oauth?view=odsp-graph-online
+Other:
+- https://learn.microsoft.com/vi-vn/graph/api/resources/drive?view=graph-rest-1.0
+- https://learn.microsoft.com/en-us/graph/api/driveitem-get-content?view=graph-rest-1.0&tabs=javascript
+- https://learn.microsoft.com/en-us/onedrive/developer/rest-api/api/driveitem_get?view=odsp-graph-online
+- https://techcommunity.microsoft.com/t5/microsoft-stream-on-sharepoint/api-access-to-stream-videos-and-transcripts/m-p/3685710
+Manage: https://entra.microsoft.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/CallAnAPI/appId/eba0e7fd-a49a-4954-a40d-01e0dae08279/isMSAApp~/true

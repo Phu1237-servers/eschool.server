@@ -18,4 +18,8 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
-Route::apiResource('categories', App\Http\Controllers\API\CategoryController::class);
+Route::apiResources([
+    'categories' => App\Http\Controllers\API\CategoryController::class,
+    'courses' => App\Http\Controllers\API\CourseController::class,
+    'course-progress' => App\Http\Controllers\API\CourseVideoController::class,
+]);
