@@ -7,3 +7,6 @@ Other:
 - https://learn.microsoft.com/en-us/onedrive/developer/rest-api/api/driveitem_get?view=odsp-graph-online
 - https://techcommunity.microsoft.com/t5/microsoft-stream-on-sharepoint/api-access-to-stream-videos-and-transcripts/m-p/3685710
 Manage: https://entra.microsoft.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/CallAnAPI/appId/eba0e7fd-a49a-4954-a40d-01e0dae08279/isMSAApp~/true
+
+ONEDRIVE_CLIENT_ID=693be6a9-f5e1-4933-8925-782a62d8ee59
+ONEDRIVE_CLIENT_SECRET=4nx8Q~n4~YJ7iGqdFu4.Ksi94eOUtfrYctLpOaVl
