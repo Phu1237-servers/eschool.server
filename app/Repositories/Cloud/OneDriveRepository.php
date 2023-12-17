@@ -61,11 +61,12 @@ class OneDriveRepository implements OneDriveInterface
             $logger->info($http->body());
         }
 
-        Cache::rememberForever(OneDriveType::CACHE_REFRESH_TOKEN, function () use ($http) {
-            return $http['refresh_token'];
+        $response = $http->json();
+        Cache::rememberForever(OneDriveType::CACHE_REFRESH_TOKEN, function () use ($response) {
+            return $response['refresh_token'];
         });
-        Cache::remember(OneDriveType::CACHE_ACCESS_TOKEN, $http['expires_in'], function () use ($http) {
-            return $http['access_token'];
+        Cache::remember(OneDriveType::CACHE_ACCESS_TOKEN, $response['expires_in'], function () use ($response) {
+            return $response['access_token'];
         });
     }
 
