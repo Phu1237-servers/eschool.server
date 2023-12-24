@@ -14,6 +14,7 @@ class CourseController extends Controller
     public function __construct(InstallInterface $installRepository)
     {
         $this->installRepository = $installRepository;
+        $this->middleware('onedrive')->only(['update']);
     }
 
     /**
@@ -53,10 +54,7 @@ class CourseController extends Controller
      */
     public function update(Request $request, Course $course)
     {
-        // var_dump($course->cloud_path); exit;
         $result = $this->installRepository->getDirectory($course->cloud_path, true);
-
-        // return response()->json($course);
 
         $videos = $this->installRepository->mergeVideoWithSub($result);
         $videos->each(function ($video) {

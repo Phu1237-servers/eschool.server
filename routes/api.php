@@ -21,5 +21,19 @@ use Illuminate\Support\Facades\Route;
 Route::apiResources([
     'categories' => App\Http\Controllers\API\CategoryController::class,
     'courses' => App\Http\Controllers\API\CourseController::class,
-    'course-progress' => App\Http\Controllers\API\CourseVideoController::class,
 ]);
+
+Route::group(['name' => 'auth.'], function () {
+    Route::post('/login', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'store']);
+    Route::post('/register', [App\Http\Controllers\Auth\RegisteredUserController::class, 'store']);
+    Route::post('/logout', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'logout']);
+});
+
+Route::group(['middleware' => 'auth:api'], function () {
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+    Route::apiResources([
+        'courses-progress' => App\Http\Controllers\API\CourseProgressController::class,
+    ]);
+});

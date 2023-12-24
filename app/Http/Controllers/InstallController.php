@@ -39,7 +39,7 @@ class InstallController extends Controller
         $directory_path = 'drive/root:'.env('ONEDRIVE_ROOT');
 
         $result = collect();
-        $cache = false;
+        $cache = true;
         if (!$cache || !Cache::has(OneDriveType::CACHE_DIRECTORIES)) {
             $result = $this->installRepository->getDirectory($directory_path, 1);
             if ($cache) {
