@@ -41,13 +41,13 @@ class OneDriveRepository implements OneDriveInterface
             ->execute();
     }
 
-    public function assignToken($code, $logger = null): void
+    public function assignToken($code, $redirect_url, $logger = null): void
     {
         $body = [
             'client_id' => env('ONEDRIVE_CLIENT_ID'),
             'client_secret' => env('ONEDRIVE_CLIENT_SECRET'),
             'code' => $code,
-            'redirect_uri' => env('ONEDRIVE_REDIRECT_URI'),
+            'redirect_uri' => $redirect_url,
         ];
         $grant_type = 'authorization_code';
         if (!Cache::has(OneDriveType::CACHE_ACCESS_TOKEN) && Cache::has(OneDriveType::CACHE_REFRESH_TOKEN)) {

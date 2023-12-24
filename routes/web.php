@@ -28,3 +28,4 @@ Route::group(['middleware' => 'onedrive'], function () {
 });
 Route::get('flush', [App\Http\Controllers\OneDriveController::class, 'flush']);
 Route::get('/access_token_response', [App\Http\Controllers\InstallController::class, 'access_token_response'])->name('redirect_uri');
+Route::get('/console_access_token', [App\Http\Controllers\InstallController::class, 'console_access_token'])->name('console_redirect_uri');

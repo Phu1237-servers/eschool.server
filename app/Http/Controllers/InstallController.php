@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Course;
 use App\Models\CourseVideo;
-use App\Repositories\Cloud\OneDriveInterface;
+use App\Repositories\Cloud\OneDriveRepository;
 use App\Repositories\InstallRepository;
 use App\Types\OneDriveType;
 use Cache;
@@ -17,7 +17,7 @@ class InstallController extends Controller
     private $installRepository;
     private $oneDriveRepository;
     private $log;
-    public function __construct(InstallRepository $installRepository, OneDriveInterface $oneDriveRepository)
+    public function __construct(InstallRepository $installRepository, OneDriveRepository $oneDriveRepository)
     {
         $this->installRepository = $installRepository;
         $this->oneDriveRepository = $oneDriveRepository;
@@ -94,8 +94,13 @@ class InstallController extends Controller
     public function access_token_response(Request $request)
     {
         $code = $request->get('code');
-        $this->oneDriveRepository->assignToken($code, $this->log);
+        $this->oneDriveRepository->assignToken($code, env('ONEDRIVE_REDIRECT_URI'), $this->log);
 
         return redirect()->route('install.submit');
+    }
+
+    public function console_access_token(Request $request)
+    {
+        return $request->get('code');
     }
 }
