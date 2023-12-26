@@ -17,11 +17,13 @@ class OneDriveRepository implements OneDriveInterface
     public function __construct()
     {
         $this->graph = new Graph();
-        $this->graph->setAccessToken(Cache::get(\App\Types\OneDriveType::CACHE_ACCESS_TOKEN));
+        $this->graph = $this->graph->setAccessToken(Cache::get(\App\Types\OneDriveType::CACHE_ACCESS_TOKEN));
     }
 
     public function getDirectoryByPath($path): Directory | array
     {
+        $this->graph->setAccessToken(Cache::get(\App\Types\OneDriveType::CACHE_ACCESS_TOKEN));
+
         return $this->graph->createRequest('GET', 'https://graph.microsoft.com/v1.0/me/'.$path.':/children')
             ->setReturnType(Directory::class)
             ->execute();

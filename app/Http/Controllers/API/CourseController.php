@@ -22,7 +22,7 @@ class CourseController extends Controller
      */
     public function index()
     {
-        $courses = Course::with(['category', 'videos'])->paginate(10);
+        $courses = Course::with(['category', 'videos'])->get();
 
         return [
             'data' => $courses,
