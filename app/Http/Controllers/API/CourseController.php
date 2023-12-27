@@ -45,7 +45,7 @@ class CourseController extends Controller
         $course->increment('views');
 
         return [
-            'data' => $course->load(['category', 'videos'])->append('related_courses'),
+            'data' => $course->load(['category', 'videos']),
         ];
     }
 

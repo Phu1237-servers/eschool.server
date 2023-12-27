@@ -9,7 +9,7 @@ class CourseProgress extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'progress', 'course_id', 'user_id',
+        'progress', 'course_video_id', 'user_id',
     ];
 
     /**
@@ -23,7 +23,7 @@ class CourseProgress extends Model
 
     public function course()
     {
-        return $this->belongsTo(Course::class);
+        return $this->belongsToThrough(Course::class, CourseVideo::class);
     }
 
     public function user()

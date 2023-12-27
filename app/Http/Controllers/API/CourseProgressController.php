@@ -34,10 +34,23 @@ class CourseProgressController extends Controller
 
     /**
      * Update the specified resource in storage.
+     * @param mixed $courses_id
      */
-    public function update(Request $request, CourseProgress $courseProgress)
+    public function update(Request $request)
     {
-        //
+        CourseProgress::updateOrCreate(
+            [
+                'course_video_id' => $request->course_video_id,
+                'user_id' => $request->user()->id,
+            ],
+            [
+                'progress' => $request->progress,
+            ]
+        );
+
+        return response()->json([
+            'message' => 'success',
+        ]);
     }
 
     /**

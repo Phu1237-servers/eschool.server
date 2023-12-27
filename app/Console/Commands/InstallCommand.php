@@ -63,14 +63,18 @@ class InstallCommand extends Command
                 $result = Cache::get(OneDriveType::CACHE_DIRECTORIES);
             }
             $this->log->info($result);
-            $result->each(function ($category) {
+            $number_of_category = $result->count();
+            $number_of_course = 0;
+            $number_of_video = 0;
+            $result->each(function ($category) use (&$number_of_course, &$number_of_video) {
                 $new_category = Category::updateOrcreate([
                     'cloud_id' => $category['id'],
                     'cloud_path' => $category['path'],
                 ], [
                     'name' => $category['name'],
                 ]);
-                $category['children']->each(function ($course) use ($new_category) {
+                $number_of_course += $category['children']->count();
+                $category['children']->each(function ($course) use (&$number_of_video, $new_category) {
                     $new_course = Course::updateOrcreate([
                         'cloud_id' => $course['id'],
                         'cloud_path' => $course['path'],
@@ -81,8 +85,10 @@ class InstallCommand extends Command
                         'category_id' => $new_category->id,
                     ]);
                     if (isset($course['children'])) {
+                        $number_of_video += $course['children']->count();
                         $videos = $this->installRepository->mergeVideoWithSub($course['children']);
-                        $videos->each(function ($video) use ($new_course) {
+                        $videos->each(function ($video) use ($number_of_video, $new_course) {
+                            $number_of_video++;
                             if ($video['type'] === 'other') return;
                             $video_data = $video['data'];
                             CourseVideo::updateOrcreate([
@@ -100,6 +106,9 @@ class InstallCommand extends Command
                     }
                 });
             });
+            $log_string = 'Installed successfully! '.$number_of_category.' categories, '.$number_of_course.' courses, '.$number_of_video.' videos.';
+            $this->info($log_string);
+            $this->log->info($log_string);
         }
     }
 

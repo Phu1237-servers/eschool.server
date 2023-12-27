@@ -12,7 +12,7 @@ class Course extends Model
         'name', 'description', 'thumbnail', 'views', 'cloud_id', 'cloud_path', 'category_id'
     ];
     protected $appends = [
-        'current_progress'
+        'current_watching_video',
     ];
 
     public function category()
@@ -30,22 +30,8 @@ class Course extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function progress()
+    public function getCurrentWatchingVideoAttribute()
     {
-        return $this->hasOne(CourseProgress::class);
-    }
-
-    public function getCurrentProgressAttribute()
-    {
-        if (auth()->check()) {
-        return $this->progress()->where('user_id', auth()->user()->id)->first()->progress ?? 0;
-        }
-
-        return 0;
-    }
-
-    public function getRelatedCoursesAttribute()
-    {
-        return $this->where('category_id', $this->category_id)->where('id', '!=', $this->id)->get();
+        return $this->hasManyThrough(CourseProgress::class, CourseVideo::class)->where('user_id', auth()->id())->orderBy('updated_at', 'DESC')->first()->course_video_id ?? 0;
     }
 }
